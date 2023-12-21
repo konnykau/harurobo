@@ -19,26 +19,35 @@ inline vec2d vec2d::make(float x,float y){
 class motor{
     private:
     const vec2d direction;//モーターの向いている方向ベクトル
-    public:
     float TARGET;//TARGET
     const int CAN_ID;//CAN ID
 
-    
+    public:
     motor(float x,float y,int CAN_ID)
     :direction(vec2d(x,y)),CAN_ID(CAN_ID),TARGET(0)
     {}//初期化
     void set_target(float power){
         this->TARGET = power;
     }//TARGETを代入
-    friend auto operator*(vec2d a,motor b) -> float{
-        return a*b.direction;
-    }//内積<-これをなくしたい
+    // friend auto operator*(vec2d a,motor b) -> float{
+    //     return a*b.direction;
+    // }//内積<-これをなくしたい
+    int get_CAN_ID(){
+        return this->CAN_ID;
+    }
+    float get_TARGET(){
+        return this->TARGET;
+    }
+    vec2d get_vec2d(){
+        return direction;
+    }
 
 
 };
 
 
-enum turn_direction{left_turn = -1,no_turn = 0,right_turn = 1};
+enum class turn_direction{left_turn, no_turn, right_turn};
+enum class motor_name{right_front_motor, left_front_motor, left_back_motor, right_back_motor};
 
 
 class undercarriage{
@@ -60,6 +69,8 @@ class undercarriage{
     void set_direction(float x,float y);//行きたい方向
     void send_data();//データを送る
     void update(float x,float y,turn_direction turn_dir);//他の関数を全部融合させた
+    int get_CAN_ID(motor_name motor);
+    float get_TARGET(motor_name motor);
 };
 
 inline void undercarriage::set_direction(float x,float y){
@@ -72,23 +83,23 @@ inline void undercarriage::set_direction(float x,float y){
 
 inline void undercarriage::set_motor_power(turn_direction turn_dir){
 
-    if(turn_dir == 1){
+    if(turn_dir == turn_direction::left_turn){
         right_front_motor.set_target(MAX_OF_TARGET/5);
         left_front_motor.set_target(MAX_OF_TARGET/5);
         left_back_motor.set_target(MAX_OF_TARGET/5);
         right_back_motor.set_target(MAX_OF_TARGET/5);
     }
-    else if(turn_dir == -1){
+    else if(turn_dir == turn_direction::right_turn){
         right_front_motor.set_target(-MAX_OF_TARGET/5);
         left_front_motor.set_target(-MAX_OF_TARGET/5);
         left_back_motor.set_target(-MAX_OF_TARGET/5);
         right_back_motor.set_target(-MAX_OF_TARGET/5);
     }
     else{
-        right_front_motor.set_target(direction*this->right_front_motor*MAX_OF_TARGET);
-        left_front_motor.set_target(direction*this->left_front_motor*MAX_OF_TARGET);
-        left_back_motor.set_target(direction*this->left_back_motor*MAX_OF_TARGET);
-        right_back_motor.set_target(direction*this->right_back_motor*MAX_OF_TARGET);
+        right_front_motor.set_target(direction*this->right_front_motor.get_vec2d()*MAX_OF_TARGET);
+        left_front_motor.set_target(direction*this->left_front_motor.get_vec2d()*MAX_OF_TARGET);
+        left_back_motor.set_target(direction*this->left_back_motor.get_vec2d()*MAX_OF_TARGET);
+        right_back_motor.set_target(direction*this->right_back_motor.get_vec2d()*MAX_OF_TARGET);
     }
     
 
@@ -100,6 +111,37 @@ inline void undercarriage::update(float x,float y,turn_direction turn_dir)
     this->set_direction(x,y);
     this->set_motor_power(turn_dir);
     this->send_data();
+}
+
+inline int undercarriage::get_CAN_ID(motor_name motor_namae){
+    if(motor_namae == motor_name::left_back_motor){
+        return this->left_back_motor.get_CAN_ID();
+    }
+    if(motor_namae == motor_name::right_back_motor){
+        return this->right_back_motor.get_CAN_ID();
+    }
+    if(motor_namae == motor_name::right_front_motor){
+        return this->right_front_motor.get_CAN_ID();
+    }
+    if(motor_namae == motor_name::left_back_motor){
+        return this->left_front_motor.get_CAN_ID();
+    }
+    
+}
+
+inline float undercarriage::get_TARGET(motor_name motor){
+    if(motor == motor_name::left_back_motor){
+        return this->left_back_motor.get_TARGET();
+    }
+    if(motor == motor_name::right_back_motor){
+        return this->right_back_motor.get_TARGET();
+    }
+    if(motor == motor_name::right_front_motor){
+        return this->right_front_motor.get_TARGET();
+    }
+    if(motor == motor_name::left_back_motor){
+        return this->left_front_motor.get_TARGET();
+    }
 }
 
 inline void undercarriage::send_data(){

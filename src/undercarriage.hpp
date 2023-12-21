@@ -12,17 +12,18 @@ struct vec2d{
     static vec2d make(float x,float y);//ｘ,ｙを要素にもつベクトルを返す
 };
 
-vec2d vec2d::make(float x,float y){
+inline vec2d vec2d::make(float x,float y){
     return vec2d{.x = x,.y = y};
 }
 
 class motor{
     private:
     const vec2d direction;//モーターの向いている方向ベクトル
+    public:
     float TARGET;//TARGET
     const int CAN_ID;//CAN ID
 
-    public:
+    
     motor(float x,float y,int CAN_ID)
     :direction(vec2d(x,y)),CAN_ID(CAN_ID),TARGET(0)
     {}//初期化
@@ -43,13 +44,14 @@ enum turn_direction{left_turn = -1,no_turn = 0,right_turn = 1};
 class undercarriage{
     private:
     vec2d direction;//進みたい方向
+    public:
     motor right_front_motor;
     motor left_front_motor;
     motor left_back_motor;
     motor right_back_motor;
     //四輪オムニ    
 
-    public:
+    
     undercarriage(int right_front_CAN_ID,int left_front_CAN_ID,int left_back_CAN_ID,int right_back_CAN_ID)
     :right_front_motor(motor(-cos45,cos45,right_front_CAN_ID)),left_front_motor(motor(cos45,cos45,left_front_CAN_ID)),
     left_back_motor(motor(-cos45,-cos45,left_back_CAN_ID)),right_back_motor(motor(cos45,-cos45,right_back_CAN_ID))
@@ -60,46 +62,46 @@ class undercarriage{
     void update(float x,float y,turn_direction turn_dir);//他の関数を全部融合させた
 };
 
-void undercarriage::set_direction(float x,float y){
+inline void undercarriage::set_direction(float x,float y){
     this->direction.x = x;
     this->direction.y = y;
 }
 
-# define NUMBER 20
+# define MAX_OF_TARGET 20
 //多分TARGETの最大値になるはず
 
-void undercarriage::set_motor_power(turn_direction turn_dir){
+inline void undercarriage::set_motor_power(turn_direction turn_dir){
 
     if(turn_dir == 1){
-        right_front_motor.set_target(NUMBER/5);
-        left_front_motor.set_target(NUMBER/5);
-        left_back_motor.set_target(NUMBER/5);
-        right_back_motor.set_target(NUMBER/5);
+        right_front_motor.set_target(MAX_OF_TARGET/5);
+        left_front_motor.set_target(MAX_OF_TARGET/5);
+        left_back_motor.set_target(MAX_OF_TARGET/5);
+        right_back_motor.set_target(MAX_OF_TARGET/5);
     }
     else if(turn_dir == -1){
-        right_front_motor.set_target(-NUMBER/5);
-        left_front_motor.set_target(-NUMBER/5);
-        left_back_motor.set_target(-NUMBER/5);
-        right_back_motor.set_target(-NUMBER/5);
+        right_front_motor.set_target(-MAX_OF_TARGET/5);
+        left_front_motor.set_target(-MAX_OF_TARGET/5);
+        left_back_motor.set_target(-MAX_OF_TARGET/5);
+        right_back_motor.set_target(-MAX_OF_TARGET/5);
     }
     else{
-        right_front_motor.set_target(direction*this->right_front_motor*NUMBER);
-        left_front_motor.set_target(direction*this->left_front_motor*NUMBER);
-        left_back_motor.set_target(direction*this->left_back_motor*NUMBER);
-        right_back_motor.set_target(direction*this->right_back_motor*NUMBER);
+        right_front_motor.set_target(direction*this->right_front_motor*MAX_OF_TARGET);
+        left_front_motor.set_target(direction*this->left_front_motor*MAX_OF_TARGET);
+        left_back_motor.set_target(direction*this->left_back_motor*MAX_OF_TARGET);
+        right_back_motor.set_target(direction*this->right_back_motor*MAX_OF_TARGET);
     }
     
 
 
 }
 
-void undercarriage::update(float x,float y,turn_direction turn_dir)
+inline void undercarriage::update(float x,float y,turn_direction turn_dir)
 {
     this->set_direction(x,y);
     this->set_motor_power(turn_dir);
     this->send_data();
 }
 
-void undercarriage::send_data(){
+inline void undercarriage::send_data(){
     //書いて
 }

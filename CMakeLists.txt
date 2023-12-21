@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 project(harurobo)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic -std=c++20)
 endif()
 
 # find dependencies
@@ -12,14 +12,15 @@ find_package(ament_cmake REQUIRED)
 # find_package(<dependency> REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(can_plugins2 REQUIRED)
 
-add_executable(controller src/main.cpp)
-ament_target_dependencies(controller rclcpp sensor_msgs)
+include_directories(
+  include
+  # ${can_plugins2_INCLUDE_DIRS}
+)
 
-target_include_directories(controller PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(controller PUBLIC c_std_99 cxx_std_17)
+add_executable(controller src/undercarriage.cpp)
+ament_target_dependencies(controller rclcpp sensor_msgs can_plugins2)
 
 ament_export_include_directories(include)
 

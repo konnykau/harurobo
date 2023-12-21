@@ -31,7 +31,7 @@ class motor{
     }//TARGETを代入
     friend auto operator*(vec2d a,motor b) -> float{
         return a*b.direction;
-    }//内積
+    }//内積<-これをなくしたい
 
 
 };
@@ -55,12 +55,12 @@ class undercarriage{
     left_back_motor(motor(-cos45,-cos45,left_back_CAN_ID)),right_back_motor(motor(cos45,-cos45,right_back_CAN_ID))
     {}//初期化
     void set_motor_power(turn_direction turn_dir);//4タイヤがうまく回るようにする
-    void set_vector(float x,float y);//行きたい方向
+    void set_direction(float x,float y);//行きたい方向
     void send_data();//データを送る
     void update(float x,float y,turn_direction turn_dir);//他の関数を全部融合させた
 };
 
-void undercarriage::set_vector(float x,float y){
+void undercarriage::set_direction(float x,float y){
     this->direction.x = x;
     this->direction.y = y;
 }
@@ -95,7 +95,7 @@ void undercarriage::set_motor_power(turn_direction turn_dir){
 
 void undercarriage::update(float x,float y,turn_direction turn_dir)
 {
-    this->set_vector(x,y);
+    this->set_direction(x,y);
     this->set_motor_power(turn_dir);
     this->send_data();
 }

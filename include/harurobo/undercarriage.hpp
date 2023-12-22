@@ -1,6 +1,6 @@
 #include <math.h>
 #include <can_utils.hpp>
-#include <send_data.hpp>
+#include "harurobo/send_data.hpp"
 #define cos45 1/std::sqrt(2)
 // constexpr float cos45 = 1/sqrt(2);
 
@@ -72,8 +72,8 @@ class undercarriage{
 
     
     undercarriage(int right_front_CAN_ID,int left_front_CAN_ID,int left_back_CAN_ID,int right_back_CAN_ID)
-    :right_front_motor(motor(-cos45,cos45,right_front_CAN_ID)),left_front_motor(motor(cos45,cos45,left_front_CAN_ID)),
-    left_back_motor(motor(-cos45,-cos45,left_back_CAN_ID)),right_back_motor(motor(cos45,-cos45,right_back_CAN_ID))
+    :right_front_motor(motor(-cos45,cos45,right_front_CAN_ID)),left_front_motor(motor(-cos45,-cos45,left_front_CAN_ID)),
+    left_back_motor(motor(cos45,-cos45,left_back_CAN_ID)),right_back_motor(motor(cos45,cos45,right_back_CAN_ID))
     {}//初期化
     void set_motor_power(turn_direction turn_dir);//4タイヤがうまく回るようにする
     void set_direction(float x,float y);//行きたい方向

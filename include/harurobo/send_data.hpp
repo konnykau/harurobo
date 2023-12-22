@@ -1,3 +1,5 @@
+#pragma once
+
 #include <can_utils.hpp>
 #include <utility>
 namespace can_utils{

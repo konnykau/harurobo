@@ -9,14 +9,14 @@
 
 using std::placeholders::_1;
 
-class Joy_subscriber : public rclcpp::Node
+class Undercarriage_Node: public rclcpp::Node
 {
 public:
-  Joy_subscriber()
+  Undercarriage_Node()
   : Node("joy_subscriber"),koinobori(undercarriage(0x100,0x200,0x300,0x640))
   {
     subscription_ = this->create_subscription<sensor_msgs::msg::Joy>(
-      "joy", 10, std::bind(&Joy_subscriber::topic_callback, this, _1));
+      "joy", 10, std::bind(&Undercarriage_Node::topic_callback, this, _1));
     can_pub_ = this->create_publisher<can_plugins2::msg::Frame>("can_tx", 10);
   }
   
@@ -44,7 +44,6 @@ private:
         can_pub_->publish(std::move(LF_mode_frame));
         can_pub_->publish(std::move(LB_mode_frame));
     }//mode disにする
-    // RCLCPP_INFO(this->get_logger(), "I heard: '%d'", msg.buttons[0]);
     if(msg.buttons[9]){//ZL(left shouldderボタン)
         this->koinobori.update(msg.axes[0],msg.axes[1],turn_direction::left_turn);
     }//left turn
@@ -54,14 +53,10 @@ private:
     else{
         this->koinobori.update(msg.axes[0],msg.axes[1],turn_direction::no_turn);
     }//平行移動
-    auto RFframe = can_utils::shirasu_target(koinobori.get_CAN_ID(motor_name::right_front_motor)+1,koinobori.get_TARGET(motor_name::right_front_motor));
-    auto RBframe = can_utils::shirasu_target(koinobori.get_CAN_ID(motor_name::right_back_motor)+1,koinobori.get_TARGET(motor_name::right_back_motor));
-    auto LFframe = can_utils::shirasu_target(koinobori.get_CAN_ID(motor_name::left_front_motor)+1,koinobori.get_TARGET(motor_name::left_front_motor));
-    auto LBframe = can_utils::shirasu_target(koinobori.get_CAN_ID(motor_name::left_back_motor)+1,koinobori.get_TARGET(motor_name::left_back_motor));
-    can_pub_->publish(std::move(RFframe));
-    can_pub_->publish(std::move(RBframe));
-    can_pub_->publish(std::move(LFframe));
-    can_pub_->publish(std::move(LBframe));
+    can_pub_->publish(koinobori.make_CAN_Frame(motor_name::right_front_motor));
+    can_pub_->publish(koinobori.make_CAN_Frame(motor_name::left_front_motor));
+    can_pub_->publish(koinobori.make_CAN_Frame(motor_name::left_back_motor));
+    can_pub_->publish(koinobori.make_CAN_Frame(motor_name::right_back_motor));
 
   }
     rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr subscription_;
@@ -73,7 +68,7 @@ private:
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<Joy_subscriber>());
+  rclcpp::spin(std::make_shared<Undercarriage_Node>());
   rclcpp::shutdown();
   return 0;
 }

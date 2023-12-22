@@ -1,7 +1,7 @@
 #include <math.h>
 #include <can_utils.hpp>
 #include <send_data.hpp>
-#define cos45 1/sqrt(2)
+#define cos45 1/std::sqrt(2)
 // constexpr float cos45 = 1/sqrt(2);
 
 struct vec2d{
@@ -23,7 +23,7 @@ class motor{
     const vec2d direction;//モーターの向いている方向ベクトル
     const int CAN_ID;//CAN ID
     float TARGET;//TARGET
-    std::unique_ptr<can_plugins2::msg::Frame> CAN_Frame;//can通信で送るもの    
+    // std::unique_ptr<can_plugins2::msg::Frame> CAN_Frame;//can通信で送るもの    
 
     public:
     motor(float x,float y,int CAN_ID)
@@ -34,12 +34,17 @@ class motor{
     }//TARGETを代入
     std::unique_ptr<can_plugins2::msg::Frame> make_frame()
     {
-        this->CAN_Frame = can_utils::shirasu_target(this->CAN_ID + 1,this->TARGET);
         return can_utils::shirasu_target(this->CAN_ID + 1,this->TARGET);
     }
-    int get_CAN_ID(){
-        return this->CAN_ID;
+    std::unique_ptr<can_plugins2::msg::Frame> mode_vel(){
+        return can_utils::generate_frame(this->CAN_ID,0x5);
     }
+    std::unique_ptr<can_plugins2::msg::Frame> mode_dis(){
+        return can_utils::generate_frame(this->CAN_ID,0x0);
+    }
+    // int get_CAN_ID(){
+    //     return this->CAN_ID;
+    // }
     // float get_TARGET(){
     //     return this->TARGET;
     // }
@@ -73,8 +78,9 @@ class undercarriage{
     void set_motor_power(turn_direction turn_dir);//4タイヤがうまく回るようにする
     void set_direction(float x,float y);//行きたい方向
     std::unique_ptr<can_plugins2::msg::Frame> make_CAN_Frame(motor_name motor);//CANパッケージを詰め込む
+    std::unique_ptr<can_plugins2::msg::Frame> make_CAN_mode(motor_name motor,bool motor_state);//modeを設定
     void update(float x,float y,turn_direction turn_dir);//他の関数を全部融合させた
-    int get_CAN_ID(motor_name motor);
+    // int get_CAN_ID(motor_name motor);
     // float get_TARGET(motor_name motor);
 };
 
@@ -93,7 +99,7 @@ inline void undercarriage::set_motor_power(turn_direction turn_dir){
         left_front_motor.set_target(MAX_OF_TARGET/5);
         left_back_motor.set_target(MAX_OF_TARGET/5);
         right_back_motor.set_target(MAX_OF_TARGET/5);
-    }
+    }//ここの正負は不明
     else if(turn_dir == turn_direction::right_turn){
         right_front_motor.set_target(-MAX_OF_TARGET/5);
         left_front_motor.set_target(-MAX_OF_TARGET/5);
@@ -127,7 +133,47 @@ inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_Frame(m
         return this->left_front_motor.make_frame();
 
         default:
-        return can_utils::shirasu_target(200,0.0);
+        return can_utils::shirasu_target(990,0.0);
+    }
+}
+inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_mode(motor_name motor,bool motor_state){
+    if(motor_state){
+        switch (motor)
+    {
+        case motor_name::left_back_motor:
+        return this->left_back_motor.mode_vel();
+
+        case motor_name::right_back_motor:
+        return this->right_back_motor.mode_vel();
+
+        case motor_name::right_front_motor:
+        return this->right_front_motor.mode_vel();
+
+        case motor_name::left_front_motor:
+        return this->left_front_motor.mode_vel();
+
+        default:
+        return can_utils::generate_frame(0x990,0x5);
+    }
+    }
+    else{
+        switch (motor)
+    {
+        case motor_name::left_back_motor:
+        return this->left_back_motor.mode_dis();
+
+        case motor_name::right_back_motor:
+        return this->right_back_motor.mode_dis();
+
+        case motor_name::right_front_motor:
+        return this->right_front_motor.mode_dis();
+
+        case motor_name::left_front_motor:
+        return this->left_front_motor.mode_dis();
+
+        default:
+        return can_utils::generate_frame(0x990,0x0);
+    }
     }
 }
 
@@ -137,25 +183,25 @@ inline void undercarriage::update(float x,float y,turn_direction turn_dir)
     this->set_motor_power(turn_dir);
 }
 
-inline int undercarriage::get_CAN_ID(motor_name motor){
-    switch (motor)
-    {
-        case motor_name::left_back_motor:
-        return this->left_back_motor.get_CAN_ID();
+// inline int undercarriage::get_CAN_ID(motor_name motor){
+//     switch (motor)
+//     {
+//         case motor_name::left_back_motor:
+//         return this->left_back_motor.get_CAN_ID();
 
-        case motor_name::right_back_motor:
-        return this->right_back_motor.get_CAN_ID();
+//         case motor_name::right_back_motor:
+//         return this->right_back_motor.get_CAN_ID();
 
-        case motor_name::right_front_motor:
-        return this->right_front_motor.get_CAN_ID();
+//         case motor_name::right_front_motor:
+//         return this->right_front_motor.get_CAN_ID();
 
-        case motor_name::left_front_motor:
-        return this->left_front_motor.get_CAN_ID();
+//         case motor_name::left_front_motor:
+//         return this->left_front_motor.get_CAN_ID();
 
-        default:
-        return -1;
-    }
-}
+//         default:
+//         return -1;
+//     }
+// }
 
 // inline float undercarriage::get_TARGET(motor_name motor){
 //     switch (motor)

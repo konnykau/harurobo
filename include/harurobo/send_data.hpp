@@ -9,7 +9,7 @@ namespace can_utils{
         frame.is_extended = false;
         frame.is_error = false;
 
-        frame.dlc = sizeof(float);
+        frame.dlc = sizeof(float);//4個
         frame.data.fill(0);
 
         can_pack<float>(frame.data, data);

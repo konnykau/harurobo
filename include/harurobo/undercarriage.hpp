@@ -1,8 +1,8 @@
 #include <math.h>
 #include <can_utils.hpp>
 #include "harurobo/send_data.hpp"
-#define cos45 1/std::sqrt(2)
-// constexpr float cos45 = 1/sqrt(2);
+// #define cos45 1/std::sqrt(2)
+constexpr float cos45 = 0.70710767811865475344008443621;
 
 struct vec2d{
     float x;
@@ -89,10 +89,12 @@ inline void undercarriage::set_direction(float x,float y){
     this->direction.y = y;
 }
 
-# define MAX_OF_TARGET 20
-//多分TARGETの最大値になるはず
+
 
 inline void undercarriage::set_motor_power(turn_direction turn_dir){
+    // # define MAX_OF_TARGET 20
+    constexpr float MAX_OF_TARGET = 20;
+    //多分TARGETの最大値になるはず
 
     if(turn_dir == turn_direction::left_turn){
         right_front_motor.set_target(MAX_OF_TARGET/5);

@@ -1,8 +1,8 @@
 #include <math.h>
 #include <can_utils.hpp>
 #include "harurobo/send_data.hpp"
-// #define cos45 1/std::sqrt(2)
-constexpr float cos45 = 0.70710767811865475344008443621;
+#include "harurobo/fry_lib/math.hpp"
+constexpr float cos45 = 1/FRY::sqrt(2);
 
 struct vec2d{
     float x;
@@ -22,8 +22,7 @@ class motor{
     private:
     const vec2d direction;//モーターの向いている方向ベクトル
     const int CAN_ID;//CAN ID
-    float TARGET;//TARGET
-    // std::unique_ptr<can_plugins2::msg::Frame> CAN_Frame;//can通信で送るもの    
+    float TARGET;//TARGET 
 
     public:
     motor(float x,float y,int CAN_ID)
@@ -42,12 +41,6 @@ class motor{
     std::unique_ptr<can_plugins2::msg::Frame> mode_dis(){
         return can_utils::generate_frame(this->CAN_ID,0x0);
     }
-    // int get_CAN_ID(){
-    //     return this->CAN_ID;
-    // }
-    // float get_TARGET(){
-    //     return this->TARGET;
-    // }
     vec2d get_vec2d(){
         return direction;
     }
@@ -80,8 +73,6 @@ class undercarriage{
     std::unique_ptr<can_plugins2::msg::Frame> make_CAN_Frame(motor_name motor);//CANパッケージを詰め込む
     std::unique_ptr<can_plugins2::msg::Frame> make_CAN_mode(motor_name motor,bool motor_state);//modeを設定
     void update(float x,float y,turn_direction turn_dir);//他の関数を全部融合させた
-    // int get_CAN_ID(motor_name motor);
-    // float get_TARGET(motor_name motor);
 };
 
 inline void undercarriage::set_direction(float x,float y){
@@ -92,7 +83,6 @@ inline void undercarriage::set_direction(float x,float y){
 
 
 inline void undercarriage::set_motor_power(turn_direction turn_dir){
-    // # define MAX_OF_TARGET 20
     constexpr float MAX_OF_TARGET = 20;
     //多分TARGETの最大値になるはず
 
@@ -185,42 +175,4 @@ inline void undercarriage::update(float x,float y,turn_direction turn_dir)
     this->set_motor_power(turn_dir);
 }
 
-// inline int undercarriage::get_CAN_ID(motor_name motor){
-//     switch (motor)
-//     {
-//         case motor_name::left_back_motor:
-//         return this->left_back_motor.get_CAN_ID();
 
-//         case motor_name::right_back_motor:
-//         return this->right_back_motor.get_CAN_ID();
-
-//         case motor_name::right_front_motor:
-//         return this->right_front_motor.get_CAN_ID();
-
-//         case motor_name::left_front_motor:
-//         return this->left_front_motor.get_CAN_ID();
-
-//         default:
-//         return -1;
-//     }
-// }
-
-// inline float undercarriage::get_TARGET(motor_name motor){
-//     switch (motor)
-//     {
-//     case motor_name::left_back_motor:
-//         return this->left_back_motor.get_TARGET();
-    
-//     case motor_name::right_back_motor:
-//         return this->right_back_motor.get_TARGET();
-    
-//     case motor_name::right_front_motor:
-//         return this->right_front_motor.get_TARGET();
-    
-//     case motor_name::left_front_motor:
-//         return this->left_front_motor.get_TARGET();
-    
-//     default:
-//     return 0;
-//     }
-// }

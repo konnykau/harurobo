@@ -2,31 +2,18 @@
 #include <can_utils.hpp>
 #include "harurobo/send_data.hpp"
 #include "harurobo/fry_lib/math.hpp"
+#include "harurobo/fry_lib/vector.hpp"
 constexpr float cos45 = 1/FRY::sqrt(2);
-
-struct vec2d{
-    float x;
-    float y;
-    //ベクトル成分
-    friend auto operator*(const vec2d a,const vec2d b) -> float{
-        return a.x*b.x+b.y*a.y;
-    }//内積
-    static vec2d make(float x,float y);//ｘ,ｙを要素にもつベクトルを返す
-};
-
-inline vec2d vec2d::make(float x,float y){
-    return vec2d{.x = x,.y = y};
-}
 
 class motor{
     private:
-    const vec2d direction;//モーターの向いている方向ベクトル
+    const FRY::vec2d direction;//モーターの向いている方向ベクトル
     const int CAN_ID;//CAN ID
     float TARGET;//TARGET 
 
     public:
     motor(float x,float y,int CAN_ID)
-    :direction(vec2d(x,y)),CAN_ID(CAN_ID),TARGET(0)
+    :direction(FRY::vec2d(x,y)),CAN_ID(CAN_ID),TARGET(0)
     {}//初期化
     void set_target(float power){
         this->TARGET = power;
@@ -41,7 +28,7 @@ class motor{
     std::unique_ptr<can_plugins2::msg::Frame> mode_dis(){
         return can_utils::generate_frame(this->CAN_ID,0x0);
     }
-    vec2d get_vec2d(){
+    FRY::vec2d get_vec2d(){
         return direction;
     }
 
@@ -55,7 +42,7 @@ enum class motor_name{right_front_motor, left_front_motor, left_back_motor, righ
 
 class undercarriage{
     private:
-    vec2d direction;//進みたい方向
+    FRY::vec2d direction;//進みたい方向
     public:
     motor right_front_motor;
     motor left_front_motor;

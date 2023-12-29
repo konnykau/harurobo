@@ -22,34 +22,36 @@ class motor{
     {
         return can_utils::shirasu_target(this->CAN_ID + 1,this->TARGET);
     }
-    std::unique_ptr<can_plugins2::msg::Frame> mode_vel(){
-        return can_utils::generate_frame(this->CAN_ID,0x5);
+    std::unique_ptr<can_plugins2::msg::Frame> mode_vel()
+    {
+        return can_utils::generate_frame(this->CAN_ID,(uint8_t)0x5);
     }
-    std::unique_ptr<can_plugins2::msg::Frame> mode_dis(){
-        return can_utils::generate_frame(this->CAN_ID,0x0);
+    std::unique_ptr<can_plugins2::msg::Frame> mode_dis()
+    {
+        return can_utils::generate_frame(this->CAN_ID,(uint8_t)0x0);
     }
     FRY::vec2d get_vec2d(){
-        return direction;
+        return this->direction;
     }
 
 
 };
 
 
-enum class turn_direction{left_turn, no_turn, right_turn};
-enum class motor_name{right_front_motor, left_front_motor, left_back_motor, right_back_motor};
+enum class turn_direction{left_turn, no_turn, right_turn};//回転するかしないか
+enum class motor_name{right_front_motor, left_front_motor, left_back_motor, right_back_motor};//モーターの名前
 
 
 class undercarriage{
     private:
     FRY::vec2d direction;//進みたい方向
-    public:
+    
     motor right_front_motor;
     motor left_front_motor;
     motor left_back_motor;
     motor right_back_motor;
     //四輪オムニ    
-
+    public:
     
     undercarriage(int right_front_CAN_ID,int left_front_CAN_ID,int left_back_CAN_ID,int right_back_CAN_ID)
     :right_front_motor(motor(-cos45,cos45,right_front_CAN_ID)),left_front_motor(motor(-cos45,-cos45,left_front_CAN_ID)),
@@ -70,7 +72,7 @@ inline void undercarriage::set_direction(float x,float y){
 
 
 inline void undercarriage::set_motor_power(turn_direction turn_dir){
-    constexpr float MAX_OF_TARGET = 20;
+    constexpr float MAX_OF_TARGET = 20.0;
     //多分TARGETの最大値になるはず
 
     if(turn_dir == turn_direction::left_turn){
@@ -78,7 +80,7 @@ inline void undercarriage::set_motor_power(turn_direction turn_dir){
         left_front_motor.set_target(MAX_OF_TARGET/5);
         left_back_motor.set_target(MAX_OF_TARGET/5);
         right_back_motor.set_target(MAX_OF_TARGET/5);
-    }//ここの正負は不明
+    }
     else if(turn_dir == turn_direction::right_turn){
         right_front_motor.set_target(-MAX_OF_TARGET/5);
         left_front_motor.set_target(-MAX_OF_TARGET/5);
@@ -112,47 +114,47 @@ inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_Frame(m
         return this->left_front_motor.make_frame();
 
         default:
-        return can_utils::shirasu_target(990,0.0);
+        return can_utils::shirasu_target(990,0.0f);
     }
 }
 inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_mode(motor_name motor,bool motor_state){
     if(motor_state){
         switch (motor)
-    {
-        case motor_name::left_back_motor:
-        return this->left_back_motor.mode_vel();
+        {
+            case motor_name::left_back_motor:
+            return this->left_back_motor.mode_vel();
 
-        case motor_name::right_back_motor:
-        return this->right_back_motor.mode_vel();
+            case motor_name::right_back_motor:
+            return this->right_back_motor.mode_vel();
 
-        case motor_name::right_front_motor:
-        return this->right_front_motor.mode_vel();
+            case motor_name::right_front_motor:
+            return this->right_front_motor.mode_vel();
 
-        case motor_name::left_front_motor:
-        return this->left_front_motor.mode_vel();
+            case motor_name::left_front_motor:
+            return this->left_front_motor.mode_vel();
 
-        default:
-        return can_utils::generate_frame(0x990,0x5);
-    }
+            default:
+            return can_utils::generate_frame(0x990,(uint8_t)0x5);
+        }
     }
     else{
         switch (motor)
-    {
-        case motor_name::left_back_motor:
-        return this->left_back_motor.mode_dis();
+        {
+            case motor_name::left_back_motor:
+            return this->left_back_motor.mode_dis();
 
-        case motor_name::right_back_motor:
-        return this->right_back_motor.mode_dis();
+            case motor_name::right_back_motor:
+            return this->right_back_motor.mode_dis();
 
-        case motor_name::right_front_motor:
-        return this->right_front_motor.mode_dis();
+            case motor_name::right_front_motor:
+            return this->right_front_motor.mode_dis();
 
-        case motor_name::left_front_motor:
-        return this->left_front_motor.mode_dis();
+            case motor_name::left_front_motor:
+            return this->left_front_motor.mode_dis();
 
-        default:
-        return can_utils::generate_frame(0x990,0x0);
-    }
+            default:
+            return can_utils::generate_frame(0x990,(uint8_t)0x0);
+        }
     }
 }
 

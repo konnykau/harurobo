@@ -19,13 +19,13 @@ include_directories(
   # ${can_plugins2_INCLUDE_DIRS}
 )
 
-add_executable(controller src/undercarriage.cpp)
-ament_target_dependencies(controller rclcpp sensor_msgs can_plugins2)
+add_executable(undercarriage src/undercarriage.cpp)
+ament_target_dependencies(undercarriage rclcpp sensor_msgs can_plugins2)
 
 ament_export_include_directories(include)
 
 install(TARGETS
-  controller
+  undercarriage
   DESTINATION lib/${PROJECT_NAME}
 )
 

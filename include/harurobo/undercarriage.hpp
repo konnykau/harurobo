@@ -24,11 +24,11 @@ class motor{
     }
     std::unique_ptr<can_plugins2::msg::Frame> mode_vel()
     {
-        return can_utils::generate_frame(this->CAN_ID,(uint8_t)0x5);
+        return can_utils::generate_frame(this->CAN_ID,static_cast<uint8_t>(0x5));
     }
     std::unique_ptr<can_plugins2::msg::Frame> mode_dis()
     {
-        return can_utils::generate_frame(this->CAN_ID,(uint8_t)0x0);
+        return can_utils::generate_frame(this->CAN_ID,static_cast<uint8_t>(0x0));
     }
     FRY::vec2d get_vec2d(){
         return this->direction;
@@ -114,7 +114,7 @@ inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_Frame(m
         return this->left_front_motor.make_frame();
 
         default:
-        return can_utils::shirasu_target(990,0.0f);
+        return can_utils::shirasu_target(990,static_cast<float>(0));
     }
 }
 inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_mode(motor_name motor,bool motor_state){
@@ -134,7 +134,7 @@ inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_mode(mo
             return this->left_front_motor.mode_vel();
 
             default:
-            return can_utils::generate_frame(0x990,(uint8_t)0x5);
+            return can_utils::generate_frame(0x990,static_cast<uint8_t>(0x5));
         }
     }
     else{
@@ -153,7 +153,7 @@ inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_mode(mo
             return this->left_front_motor.mode_dis();
 
             default:
-            return can_utils::generate_frame(0x990,(uint8_t)0x0);
+            return can_utils::generate_frame(0x990,static_cast<uint8_t>(0x0));
         }
     }
 }

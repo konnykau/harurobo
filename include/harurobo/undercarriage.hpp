@@ -8,11 +8,11 @@ constexpr float cos45 = 1/FRY::sqrt(2);
 class motor{
     private:
     const FRY::vec2d direction;//モーターの向いている方向ベクトル
-    const int CAN_ID;//CAN ID
+    const uint16_t CAN_ID;//CAN ID
     float TARGET;//TARGET 
 
     public:
-    motor(float x,float y,int CAN_ID)
+    motor(float x,float y,uint16_t CAN_ID)
     :direction(FRY::vec2d(x,y)),CAN_ID(CAN_ID),TARGET(0)
     {}//初期化
     void set_target(float power){
@@ -53,7 +53,7 @@ class undercarriage{
     //四輪オムニ    
     public:
     
-    undercarriage(int right_front_CAN_ID,int left_front_CAN_ID,int left_back_CAN_ID,int right_back_CAN_ID)
+    undercarriage(uint16_t right_front_CAN_ID,uint16_t left_front_CAN_ID,uint16_t left_back_CAN_ID,uint16_t right_back_CAN_ID)
     :right_front_motor(motor(-cos45,cos45,right_front_CAN_ID)),left_front_motor(motor(-cos45,-cos45,left_front_CAN_ID)),
     left_back_motor(motor(cos45,-cos45,left_back_CAN_ID)),right_back_motor(motor(cos45,cos45,right_back_CAN_ID))
     {}//初期化
@@ -114,7 +114,7 @@ inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_Frame(m
         return this->left_front_motor.make_frame();
 
         default:
-        return can_utils::shirasu_target(990,static_cast<float>(0));
+        return can_utils::shirasu_target(0x990,static_cast<float>(0));
     }
 }
 inline std::unique_ptr<can_plugins2::msg::Frame> undercarriage::make_CAN_mode(motor_name motor,bool motor_state){

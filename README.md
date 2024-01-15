@@ -54,4 +54,4 @@ can_pub_->publish(Undercarriage.make_CAN_Frame(motor_name::right_back_motor));
 `ros2 run harurobo undercarriage`:足回りのコードの実行
 
 ## くそな点
-・undercarriage::updateの実装がくそ<-なぜこうしたのだ
+・undercarriage::updateの実装がくそ<-なぜこうしたのだ<-もしかしたら合理的なのかも？（改善方法が思いつかなかっただけ）

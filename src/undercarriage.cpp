@@ -38,10 +38,10 @@ private:
     }//mode disにする
 ///////////////////////////////ここの上がstartボタン、backボタンによるmodeの調整
 ///////////////////////////////ここの下から平行移動、回転をするための個々のモーターのターゲットを決めるif文
-    if(msg.buttons[4]){//ZL(left shouldderボタン)
+    if(msg.axes[2] == -1){//ZL(left shouldderボタン)
         this->koinobori.update(-msg.axes[0],msg.axes[1],turn_direction::left_turn);
     }//left turn
-    else if(msg.buttons[5]){//ZR(right shouldderボタン)
+    else if(msg.axes[5] == -1){//ZR(right shouldderボタン)
         this->koinobori.update(-msg.axes[0],msg.axes[1],turn_direction::right_turn);
     }//right turn
     else{

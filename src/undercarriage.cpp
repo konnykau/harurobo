@@ -24,13 +24,13 @@ public:
 private:
   void topic_callback(const sensor_msgs::msg::Joy & msg)//この関数が随時実行されるらしい
   {  
-    if(msg.buttons[9]){//startボタン
+    if(msg.buttons[7]){//startボタン
         can_pub_->publish(std::move(koinobori.make_CAN_mode(motor_name::right_front_motor,1)));
         can_pub_->publish(std::move(koinobori.make_CAN_mode(motor_name::left_front_motor,1)));
         can_pub_->publish(std::move(koinobori.make_CAN_mode(motor_name::left_back_motor,1)));
         can_pub_->publish(std::move(koinobori.make_CAN_mode(motor_name::right_back_motor,1)));
     }//mode velにする
-    if(msg.buttons[8]){//backボタン
+    if(msg.buttons[6]){//backボタン
         can_pub_->publish(std::move(koinobori.make_CAN_mode(motor_name::right_front_motor,0)));
         can_pub_->publish(std::move(koinobori.make_CAN_mode(motor_name::left_front_motor,0)));
         can_pub_->publish(std::move(koinobori.make_CAN_mode(motor_name::left_back_motor,0)));

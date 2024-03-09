@@ -72,20 +72,20 @@ inline void undercarriage::set_direction(float x,float y){
 
 
 inline void undercarriage::set_motor_power(turn_direction turn_dir){
-    constexpr float MAX_OF_TARGET = 20.0;
+    constexpr float MAX_OF_TARGET = 30.0;
     //多分TARGETの最大値になるはず
 
     if(turn_dir == turn_direction::left_turn){
-        right_front_motor.set_target(MAX_OF_TARGET/5);
-        left_front_motor.set_target(MAX_OF_TARGET/5);
-        left_back_motor.set_target(MAX_OF_TARGET/5);
-        right_back_motor.set_target(MAX_OF_TARGET/5);
+        right_front_motor.set_target(MAX_OF_TARGET/3);
+        left_front_motor.set_target(MAX_OF_TARGET/3);
+        left_back_motor.set_target(MAX_OF_TARGET/3);
+        right_back_motor.set_target(MAX_OF_TARGET/3);
     }
     else if(turn_dir == turn_direction::right_turn){
-        right_front_motor.set_target(-MAX_OF_TARGET/5);
-        left_front_motor.set_target(-MAX_OF_TARGET/5);
-        left_back_motor.set_target(-MAX_OF_TARGET/5);
-        right_back_motor.set_target(-MAX_OF_TARGET/5);
+        right_front_motor.set_target(-MAX_OF_TARGET/3);
+        left_front_motor.set_target(-MAX_OF_TARGET/3);
+        left_back_motor.set_target(-MAX_OF_TARGET/3);
+        right_back_motor.set_target(-MAX_OF_TARGET/3);
     }
     else{
         right_front_motor.set_target(direction*this->right_front_motor.get_vec2d()*MAX_OF_TARGET);

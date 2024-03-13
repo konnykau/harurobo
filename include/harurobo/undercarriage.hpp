@@ -72,27 +72,44 @@ inline void undercarriage::set_direction(float x,float y){
 
 
 inline void undercarriage::set_motor_power(turn_direction turn_dir){
-    constexpr float MAX_OF_TARGET = 30.0;
+    constexpr float MAX_OF_TARGET = 20.0;
+    constexpr float TURN_TARGET = 5.0;
     //多分TARGETの最大値になるはず
+    float RF_TARGET = 0;
+    float LF_TARGET = 0;
+    float LB_TARGET = 0;
+    float RB_TARGET = 0;
 
     if(turn_dir == turn_direction::left_turn){
-        right_front_motor.set_target(MAX_OF_TARGET/3);
-        left_front_motor.set_target(MAX_OF_TARGET/3);
-        left_back_motor.set_target(MAX_OF_TARGET/3);
-        right_back_motor.set_target(MAX_OF_TARGET/3);
+        // right_front_motor.set_target(TURN_TARGET);
+        // left_front_motor.set_target(TURN_TARGET);
+        // left_back_motor.set_target(TURN_TARGET);
+        // right_back_motor.set_target(TURN_TARGET);
+        RF_TARGET = TURN_TARGET;
+        LF_TARGET = TURN_TARGET;
+        LB_TARGET = TURN_TARGET;
+        RB_TARGET = TURN_TARGET;
     }
     else if(turn_dir == turn_direction::right_turn){
-        right_front_motor.set_target(-MAX_OF_TARGET/3);
-        left_front_motor.set_target(-MAX_OF_TARGET/3);
-        left_back_motor.set_target(-MAX_OF_TARGET/3);
-        right_back_motor.set_target(-MAX_OF_TARGET/3);
+        // right_front_motor.set_target(-TURN_TARGET);
+        // left_front_motor.set_target(-TURN_TARGET);
+        // left_back_motor.set_target(-TURN_TARGET);
+        // right_back_motor.set_target(-TURN_TARGET);
+        RF_TARGET = -TURN_TARGET;
+        LF_TARGET = -TURN_TARGET;
+        LB_TARGET = -TURN_TARGET;
+        RB_TARGET = -TURN_TARGET;
     }
-    else{
-        right_front_motor.set_target(direction*this->right_front_motor.get_vec2d()*MAX_OF_TARGET);
-        left_front_motor.set_target(direction*this->left_front_motor.get_vec2d()*MAX_OF_TARGET);
-        left_back_motor.set_target(direction*this->left_back_motor.get_vec2d()*MAX_OF_TARGET);
-        right_back_motor.set_target(direction*this->right_back_motor.get_vec2d()*MAX_OF_TARGET);
-    }
+    RF_TARGET += direction*this->right_front_motor.get_vec2d()*MAX_OF_TARGET;
+    LF_TARGET += direction*this->left_front_motor.get_vec2d()*MAX_OF_TARGET;
+    LB_TARGET += direction*this->left_back_motor.get_vec2d()*MAX_OF_TARGET;
+    RB_TARGET += direction*this->right_back_motor.get_vec2d()*MAX_OF_TARGET;
+
+
+    right_front_motor.set_target(RF_TARGET);
+    left_front_motor.set_target(LF_TARGET);
+    left_back_motor.set_target(LB_TARGET);
+    right_back_motor.set_target(RB_TARGET);
     
 
 

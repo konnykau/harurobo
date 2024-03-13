@@ -13,7 +13,7 @@ class Undercarriage_Node: public rclcpp::Node//rclcpp::Nodeというクラスを
 {
 public:
   Undercarriage_Node()
-  : Node("harurobo_koinobori_undercarriage"),koinobori(undercarriage(0x300,0x640,0x110,0x200))//ノード名と足回り用のシラスのCAN idの設定（初期化）
+  : Node("harurobo_koinobori_undercarriage"),koinobori(undercarriage(0x300,0x150,0x110,0x200))//ノード名と足回り用のシラスのCAN idの設定（初期化）
   {
     subscription_ = this->create_subscription<sensor_msgs::msg::Joy>(
       "joy", 10, std::bind(&Undercarriage_Node::topic_callback, this, _1));//joy == コントローラーの入力をsubscription
